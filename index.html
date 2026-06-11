@@ -647,8 +647,12 @@ body.intro-on #stb{opacity:0 !important;pointer-events:none;}
   .sec-head{margin-bottom:40px;}
   /* Testimonials */
   .voices-head{top:clamp(78px,11vh,100px);}
-  .voices-stack{height:min(430px,50vh);margin-top:5vh;}
-  .voice-card{padding:30px 22px;gap:18px;}
+  .voices-stack{height:clamp(360px,46vh,460px);margin-top:5vh;}
+  .voice-card{padding:26px 20px 22px;}
+  /* убираем дорогой blur на мобильных — главная причина краша */
+  .blob{filter:none !important;}
+  .site-header.sc{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(248,241,237,.98);}
+  #title-card{display:none !important;}
   /* Booking */
   .booking{padding:72px 0;}
   .booking-grid{grid-template-columns:1fr;gap:40px;}
@@ -1181,6 +1185,38 @@ function revealAll(){
 document.addEventListener('DOMContentLoaded',()=>{
   if(typeof gsap==='undefined'){ revealAll(); return; }
   gsap.registerPlugin(ScrollTrigger);
+
+  /* На мобильных — пропускаем тяжёлую pin-анимацию, сразу показываем контент */
+  if(window.innerWidth<=768){
+    revealAll();
+    runCounters();
+    setupScroll();
+    (function(){
+      const grid=document.querySelector('.about-grid'); if(!grid) return;
+      gsap.set(grid,{transformPerspective:1100,transformOrigin:'center center',rotateX:13,scale:0.93});
+      gsap.timeline({scrollTrigger:{trigger:'.about',start:'top 60%',end:'top 22%',scrub:1,invalidateOnRefresh:true}})
+        .to(grid,{rotateX:0,scale:1,ease:'none'},0);
+    })();
+    (function(){
+      const stack=document.querySelector('.voices-stack'); if(!stack) return;
+      const cards=gsap.utils.toArray('.voice-card'); const N=cards.length; if(!N) return;
+      function render(p){
+        const front=p*(N-1);
+        cards.forEach((c,i)=>{
+          const d=i-front; let x,y,rot,scale,op,z;
+          if(d<=0){const t=Math.min(-d,1.2),tc=Math.min(t,1);x=-10*tc;y=-150*t;rot=-10*tc;scale=1+0.04*tc;op=t>1.05?0:1;z=40+i;}
+          else{const dd=Math.min(d,2);x=0;y=dd*5;rot=dd*1.5;scale=1-dd*0.05;op=d>2.05?0:1;z=30-i;}
+          op=Math.max(0,Math.min(1,op));
+          c.style.transform='translate('+x+'px,'+y+'%) rotate('+rot+'deg) scale('+scale+')';
+          c.style.opacity=op; c.style.zIndex=Math.round(z);
+        });
+      }
+      render(0);
+      ScrollTrigger.create({trigger:'.voices',start:'top 10%',end:'bottom bottom',scrub:1,invalidateOnRefresh:true,onUpdate(self){render(self.progress);}});
+    })();
+    return;
+  }
+
   document.body.classList.add('intro-on');
   let countersDone=false;
 
