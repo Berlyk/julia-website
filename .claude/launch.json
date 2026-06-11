@@ -1,0 +1,1 @@
+﻿{"version":"0.0.1","configurations":[{"name":"julia-site","runtimeExecutable":"npx","runtimeArgs":["--yes","serve","-p","5502","."],"port":5502}]}

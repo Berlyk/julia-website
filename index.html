@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="JULIA · косметолог в Риге. Контурная пластика губ, ботокс, биоревитализация. 15 лет в медицине.">
+<title>JULIA · Aesthetic Medicine · Rīga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ╔══════════════════════════════════════════╗
+   ║           DESIGN TOKENS                  ║
+   ╚══════════════════════════════════════════╝ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  /* Rose palette */
+  --rose:#c09590;
+  --rose-soft:#d4a9a2;
+  --rose-blush:#e3c1bb;
+  --rose-pale:#eedad4;
+  --rose-deep:#a87060;
+  --rose-light:#f9f0ec;
+
+  /* Gold */
+  --gold:#c9a96e;
+  --gold-soft:#e0c99a;
+  --gold-pale:#f5ecd8;
+
+  /* Ink (warm dark — no purple, no brown) */
+  --ink:#1e1614;
+  --ink-mid:#5a4540;
+  --ink-soft:#8a7575;
+  --ink-on-dark:rgba(253,245,242,.92);
+
+  /* Neutrals */
+  --ivory:#fdfaf8;
+  --cream:#f8f1ed;
+  --linen:#f0e2dc;
+  --sand:#e3cfca;
+  --hairline:#ead9d2;
+  --border:#d8c5be;
+  --white:#fff;
+
+  /* Semantic */
+  --fg1:var(--ink);
+  --fg2:var(--ink-mid);
+  --fg3:var(--ink-soft);
+  --focus:rgba(192,149,144,.22);
+
+  /* Fonts */
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fs:'Jost',system-ui,sans-serif;
+
+  /* Radius */
+  --r-sm:6px;--r-md:10px;--r-lg:18px;--r-xl:24px;--r-pill:999px;
+
+  /* Shadows */
+  --sh-sm:0 4px 16px rgba(30,22,20,.07);
+  --sh-md:0 12px 36px rgba(30,22,20,.10);
+  --sh-lg:0 28px 60px rgba(30,22,20,.14);
+
+  /* Easing */
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ─── Base ─── */
+html{scroll-behavior:auto;overflow-x:hidden;}
+body{background:var(--cream);color:var(--fg1);font-family:var(--fs);font-weight:300;-webkit-font-smoothing:antialiased;}
+img{display:block;max-width:100%;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:var(--fs);}
+
+/* ╔══════════════════════════════════════════╗
+   ║   INTRO TITLE-CARD (растворяется в hero) ║
+   ╚══════════════════════════════════════════╝ */
+#title-card{
+  position:absolute;top:0;left:0;width:100%;height:100vh;height:100dvh;
+  z-index:20;pointer-events:none;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+#tc-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(58% 50% at 50% 40%, rgba(227,193,187,.30), transparent 72%),
+    linear-gradient(165deg,var(--ivory) 0%,var(--cream) 55%,var(--rose-pale) 100%);
+}
+#tc-title{
+  position:relative;z-index:1;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
+}
+#tc-1{
+  font-family:var(--fd);font-weight:400;text-transform:uppercase;
+  font-size:clamp(64px,16vw,184px);line-height:.92;letter-spacing:.06em;padding-left:.06em;
+  color:var(--rose);will-change:transform,opacity;
+  text-shadow:0 2px 34px rgba(253,250,248,.7);
+}
+#tc-2{
+  font-family:var(--fs);font-weight:300;text-transform:uppercase;
+  font-size:clamp(11px,2.3vw,17px);letter-spacing:.5em;padding-left:.5em;
+  color:var(--rose-deep);will-change:transform,opacity;
+}
+#tc-hint{
+  position:absolute;left:50%;bottom:34px;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--ink-soft);font-family:var(--fs);font-size:11px;
+  letter-spacing:.28em;text-transform:uppercase;
+}
+#tc-hint svg{color:var(--rose);animation:hint-bounce 1.8s ease-in-out infinite;}
+@keyframes hint-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+/* hide header / progress / scroll-top while the title-card covers the screen */
+body.intro-on .site-header,
+body.intro-on #pg,
+body.intro-on #stb{opacity:0 !important;pointer-events:none;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           PROGRESS BAR                   ║
+   ╚══════════════════════════════════════════╝ */
+#pg{position:fixed;top:0;left:0;height:2px;width:0%;
+  background:linear-gradient(90deg,var(--rose-soft),var(--gold));
+  z-index:9997;pointer-events:none;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           HEADER                         ║
+   ╚══════════════════════════════════════════╝ */
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:14px 0;
+  transition:background .5s var(--ease),padding .4s var(--ease),box-shadow .4s var(--ease);
+}
+.site-header.sc{
+  background:rgba(248,241,237,.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 1px 0 var(--hairline);
+  padding:8px 0;
+}
+.container{max-width:1240px;margin:0 auto;padding:0 52px;}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.nav-logo{height:120px;width:auto;object-fit:contain;mix-blend-mode:multiply;transition:height .4s var(--ease);}
+.site-header.sc .nav-logo{height:92px;}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--fg2);position:relative;padding-bottom:4px;transition:color .25s;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:0;width:0;height:1px;
+  background:var(--rose);transition:width .35s var(--ease);
+}
+.nav-links a:hover{color:var(--rose-deep);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  background:var(--rose);color:var(--ivory);
+  border:none;padding:14px 30px;border-radius:var(--r-pill);
+  transition:background .3s,transform .25s,box-shadow .3s;
+  white-space:nowrap;
+}
+.nav-cta:hover{background:var(--rose-deep);transform:translateY(-2px);box-shadow:0 10px 28px rgba(168,112,96,.3);}
+.menu-btn{display:none;background:none;border:none;color:var(--fg1);padding:8px;}
+
+/* ─── Mobile nav ─── */
+.mob-nav{
+  position:fixed;inset:0;
+  background:linear-gradient(165deg,var(--ivory) 0%,var(--rose-light) 58%,var(--rose-pale) 100%);
+  z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease);
+}
+.mob-nav.open{opacity:1;pointer-events:all;}
+.mob-nav a{
+  font-family:var(--fd);font-size:clamp(34px,8.5vw,52px);font-weight:400;
+  color:var(--ink);transition:color .25s;
+  cursor:pointer;
+}
+.mob-nav a:hover{color:var(--rose-deep);}
+.mob-close{
+  position:absolute;top:20px;right:20px;background:none;border:none;
+  color:var(--ink-mid);font-size:26px;padding:10px;line-height:1;
+}
+.mob-nav-cta{
+  margin-top:14px;padding:16px 48px;border-radius:var(--r-pill);
+  background:var(--rose);color:var(--ivory);font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;border:none;
+  box-shadow:0 10px 28px rgba(192,149,144,.35);
+}
+
+/* ╔══════════════════════════════════════════╗
+   ║           BUTTONS                        ║
+   ╚══════════════════════════════════════════╝ */
+.btn{
+  font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
+  padding:16px 36px;border-radius:var(--r-pill);border:1.5px solid transparent;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  position:relative;overflow:hidden;transition:all .35s var(--ease);
+  white-space:nowrap;
+}
+.btn-solid{background:var(--rose);color:var(--ivory);border-color:var(--rose);box-shadow:0 4px 20px rgba(192,149,144,.28);}
+.btn-solid:hover{background:var(--rose-deep);border-color:var(--rose-deep);transform:translateY(-2px);box-shadow:0 12px 32px rgba(168,112,96,.28);}
+.btn-outline{background:transparent;color:var(--ink-mid);border-color:var(--border);}
+.btn-outline:hover{background:var(--linen);border-color:var(--rose-soft);transform:translateY(-1px);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           HERO                           ║
+   ╚══════════════════════════════════════════╝ */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:160px 0 100px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--ivory) 0%,var(--cream) 100%);
+}
+/* blobs */
+.blob{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.b1{width:600px;height:600px;background:radial-gradient(var(--rose-blush),transparent 70%);top:-180px;right:-100px;opacity:.35;}
+.b2{width:360px;height:360px;background:radial-gradient(var(--gold-pale),transparent 70%);bottom:-100px;left:-80px;opacity:.4;}
+.b3{width:240px;height:240px;background:radial-gradient(var(--rose-pale),transparent 70%);top:48%;left:42%;opacity:.25;}
+/* deco rings */
+.h-ring{position:absolute;border-radius:50%;border:1px solid rgba(192,149,144,.12);pointer-events:none;z-index:0;}
+.h-ring-1{width:680px;height:680px;top:-200px;right:-200px;}
+.h-ring-2{width:420px;height:420px;bottom:-120px;left:-120px;}
+
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:2;}
+.hero-eyebrow{
+  font-size:11px;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--rose);display:flex;align-items:center;gap:14px;opacity:0;
+}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--rose);flex-shrink:0;}
+.hero h1{
+  font-family:var(--fd);font-weight:400;
+  font-size:clamp(44px,5.4vw,78px);
+  line-height:1.06;color:var(--fg1);margin:18px 0 0;
+}
+.hero h1 em{font-style:italic;color:var(--rose);}
+.h1-line{overflow:hidden;display:block;}
+.h1-inner{display:block;transform:translateY(110%);}
+.hero-desc{
+  font-size:17px;font-weight:300;line-height:1.85;
+  color:var(--fg2);max-width:440px;margin:24px 0 40px;
+  opacity:0;transform:translateY(24px);
+}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;opacity:0;transform:translateY(24px);}
+.hero-stats{
+  display:flex;gap:44px;margin-top:52px;padding-top:32px;
+  border-top:1px solid var(--hairline);
+  opacity:0;transform:translateY(24px);
+  flex-wrap:wrap;
+}
+.stat .n{font-family:var(--fd);font-size:44px;color:var(--rose);line-height:1;font-weight:400;}
+.stat .l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg3);margin-top:6px;}
+
+/* hero photo */
+.hero-photo-wrap{position:relative;opacity:0;}
+.hero-photo-wrap::before{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:52%;height:52%;border:1px solid var(--rose-blush);
+  border-radius:var(--r-xl);z-index:-1;pointer-events:none;
+  transition:transform .6s var(--ease);
+}
+.hero-photo-wrap:hover::before{transform:translate(5px,-5px);}
+.hero-img{
+  width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top center;
+  border-radius:var(--r-xl);box-shadow:var(--sh-lg);display:block;background:var(--linen);
+}
+.hero-badge{
+  position:absolute;bottom:24px;left:20px;max-width:calc(100% - 40px);
+  background:rgba(253,250,248,.94);backdrop-filter:blur(12px);
+  border:1px solid var(--hairline);border-radius:var(--r-lg);
+  padding:13px 18px;box-shadow:var(--sh-md);
+  display:flex;align-items:center;gap:12px;
+  animation:badge-bob 4.5s ease-in-out infinite;
+}
+@keyframes badge-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.badge-icon{
+  width:42px;height:42px;border-radius:50%;background:var(--linen);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--rose);flex-shrink:0;
+}
+.hero-badge strong{display:block;font-family:var(--fd);font-size:19px;color:var(--fg1);font-weight:500;}
+.hero-badge span{font-size:10px;letter-spacing:.14em;color:var(--fg3);text-transform:uppercase;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           MARQUEE                        ║
+   ╚══════════════════════════════════════════╝ */
+.marquee-wrap{
+  overflow:hidden;border-top:1px solid var(--hairline);
+  border-bottom:1px solid var(--hairline);background:var(--ivory);padding:16px 0;
+}
+.marquee-track{display:flex;white-space:nowrap;animation:marquee 36s linear infinite;}
+.marquee-track:hover{animation-play-state:paused;}
+.m-item{font-family:var(--fd);font-size:22px;font-weight:300;font-style:italic;color:var(--rose);padding:0 36px;flex-shrink:0;}
+.m-dot{font-size:7px;color:var(--fg3);letter-spacing:.2em;align-self:center;flex-shrink:0;}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ╔══════════════════════════════════════════╗
+   ║           SECTION COMMON                 ║
+   ╚══════════════════════════════════════════╝ */
+.section{padding:120px 0;}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 72px;}
+.eyebrow{
+  font-size:11px;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--rose);display:block;font-family:var(--fs);
+}
+.sec-head h2{
+  font-family:var(--fd);font-weight:400;
+  font-size:clamp(32px,4vw,56px);line-height:1.1;
+  color:var(--fg1);margin:16px 0 0;
+}
+.sec-head p{font-size:17px;font-weight:300;line-height:1.75;color:var(--fg2);margin:18px 0 0;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           ABOUT                          ║
+   ╚══════════════════════════════════════════╝ */
+.about{background:var(--ivory);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:88px;align-items:center;}
+.about-photo-frame{position:relative;}
+.about-photo-frame::after{
+  content:'';position:absolute;bottom:-22px;left:-22px;
+  width:48%;height:48%;background:var(--linen);border-radius:var(--r-lg);z-index:-1;
+}
+.about-img{
+  width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top center;
+  border-radius:var(--r-xl);box-shadow:var(--sh-md);display:block;background:var(--linen);
+}
+.about-text h2{font-family:var(--fd);font-weight:400;font-size:clamp(30px,3.4vw,50px);line-height:1.12;color:var(--fg1);margin:16px 0 20px;}
+.about-text>p{font-size:17px;font-weight:300;line-height:1.85;color:var(--fg2);}
+.about-points{list-style:none;padding:0;margin:32px 0 0;}
+.about-points li{display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--hairline);}
+.about-points li:last-child{border-bottom:none;}
+.ap-n{font-family:var(--fd);font-size:20px;color:var(--rose);flex-shrink:0;width:28px;font-weight:500;}
+.about-points h4{font-family:var(--fd);font-weight:500;font-size:20px;margin:0 0 5px;color:var(--fg1);}
+.about-points p{margin:0;font-size:14px;font-weight:300;line-height:1.7;color:var(--fg2);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           SERVICES — GRID                ║
+   ╚══════════════════════════════════════════╝ */
+.services{background:var(--cream);}
+.svc-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+/* card */
+.svc-card{
+  background:var(--white);border:1px solid var(--hairline);
+  border-radius:var(--r-xl);overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:box-shadow .4s var(--ease),transform .4s var(--ease);
+  position:relative;
+}
+.svc-card:hover{box-shadow:var(--sh-lg);transform:translateY(-6px);}
+/* shine sweep */
+.svc-card::after{
+  content:'';position:absolute;top:0;left:-150%;width:60%;height:100%;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
+  transition:left .85s var(--ease);pointer-events:none;z-index:10;
+}
+.svc-card:hover::after{left:150%;}
+/* visual — refined icon panel (no photos, no emoji) */
+.svc-visual{
+  aspect-ratio:16/9;position:relative;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid var(--hairline);
+}
+.svc-icon{
+  width:54px;height:54px;color:var(--rose-deep);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .6s var(--ease);
+}
+.svc-icon svg{width:100%;height:100%;}
+.svc-card:hover .svc-icon{transform:translateY(-4px) scale(1.06);}
+.svc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
+.svc-card:hover .svc-img{transform:scale(1.04);}
+/* soft rose gradient presets — all on-palette, light & warm */
+.svc-fb-1{background:linear-gradient(150deg,#fbefea,#f2d2ca);}
+.svc-fb-2{background:linear-gradient(150deg,#fcf2ee,#eecdc6);}
+.svc-fb-3{background:linear-gradient(150deg,#faf0eb,#f0d3cb);}
+.svc-fb-4{background:linear-gradient(150deg,#fcefe9,#eecfc8);}
+.svc-fb-5{background:linear-gradient(150deg,#faf1ec,#f1d4cc);}
+.svc-fb-6{background:linear-gradient(150deg,#fceeec,#f0cec8);}
+/* card body */
+.svc-body{padding:24px 26px 28px;display:flex;flex-direction:column;flex:1;}
+.svc-tag{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--rose);margin-bottom:8px;}
+.svc-card h3{font-family:var(--fd);font-weight:500;font-size:22px;margin:0 0 10px;color:var(--fg1);line-height:1.2;}
+.svc-card p{font-size:14px;font-weight:300;line-height:1.7;color:var(--fg2);margin:0 0 18px;flex:1;}
+.svc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--hairline);margin-top:auto;}
+.svc-price{font-family:var(--fd);font-size:22px;color:var(--rose-deep);font-weight:500;}
+.svc-go{
+  width:36px;height:36px;border-radius:50%;background:var(--linen);
+  border:none;display:flex;align-items:center;justify-content:center;
+  color:var(--rose);font-size:16px;
+  transition:background .3s,color .3s,transform .35s var(--ease);
+}
+.svc-card:hover .svc-go{background:var(--rose);color:var(--ivory);transform:translateX(3px);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           TESTIMONIALS                   ║
+   ╚══════════════════════════════════════════╝ */
+.voices{
+  position:relative;height:300vh;
+  background:linear-gradient(160deg,var(--linen) 0%,var(--rose-pale) 100%);
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+}
+.voices-sticky{
+  position:sticky;top:10vh;height:90vh;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:clamp(70px,9vh,100px) 20px 0;
+}
+.voices-head{text-align:center;margin:0;position:absolute;top:clamp(96px,13vh,128px);left:0;right:0;z-index:20;}
+.voices-head h2{font-family:var(--fd);font-weight:400;font-size:clamp(38px,5vw,70px);line-height:1.1;color:var(--fg1);margin:14px 0 0;}
+.voices-stack{position:relative;width:min(380px,84vw);height:min(440px,50vh);margin-top:7vh;}
+.voices-sticky::before,.voices-sticky::after{
+  content:'“';position:absolute;font-family:var(--fd);font-weight:400;line-height:1;
+  font-size:min(50vh,460px);color:rgba(192,149,144,.13);pointer-events:none;z-index:0;
+}
+.voices-sticky::before{top:4vh;left:3vw;}
+.voices-sticky::after{content:'”';bottom:-6vh;right:3vw;}
+.voice-card{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  background:var(--ivory);
+  border:1px solid var(--border);border-radius:24px;
+  padding:38px 32px;text-align:center;box-shadow:var(--sh-lg);
+  will-change:transform,opacity;backface-visibility:hidden;
+}
+.vc-stars{display:flex;gap:5px;color:var(--gold);}
+.vc-stars svg{width:18px;height:18px;}
+.vc-quote{font-family:var(--fd);font-style:italic;font-weight:400;font-size:clamp(18px,2.3vw,27px);line-height:1.45;color:var(--ink);margin:0;}
+.vc-author{display:flex;align-items:center;gap:14px;margin-top:4px;}
+.vc-avatar{
+  width:48px;height:48px;border-radius:50%;flex-shrink:0;
+  background:var(--linen);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:17px;font-weight:500;color:var(--rose-deep);letter-spacing:.02em;
+}
+.vc-meta{text-align:left;}
+.vc-name{display:block;font-family:var(--fd);font-size:18px;font-weight:500;color:var(--ink);line-height:1.1;}
+.vc-role{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           BOOKING                        ║
+   ╚══════════════════════════════════════════╝ */
+.booking{background:var(--ivory);}
+.booking-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:88px;align-items:start;}
+.booking-info h2{font-family:var(--fd);font-weight:400;font-size:clamp(30px,3.4vw,50px);line-height:1.1;color:var(--fg1);margin:16px 0 20px;}
+.booking-info>p{font-size:16px;font-weight:300;line-height:1.85;color:var(--fg2);}
+.info-list{list-style:none;padding:0;margin:28px 0 0;}
+.info-list li{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:13px 0;border-bottom:1px solid var(--hairline);
+  font-size:15px;font-weight:300;color:var(--fg2);line-height:1.5;
+}
+.info-list li:last-child{border-bottom:none;}
+.info-list .ic{color:var(--rose);flex-shrink:0;margin-top:2px;}
+.form-card{
+  background:var(--white);border:1px solid var(--hairline);
+  border-radius:var(--r-xl);padding:44px;box-shadow:var(--sh-md);
+  position:relative;
+}
+/* ── Service picker trigger ── */
+.svc-trigger{
+  width:100%;text-align:left;font-family:var(--fs);font-weight:300;font-size:15px;
+  color:var(--fg3);background:var(--ivory);
+  border:1.5px solid var(--border);border-radius:var(--r-md);
+  padding:13px 16px;outline:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:border .25s,box-shadow .25s,color .2s;
+}
+.svc-trigger.has-val{color:var(--fg1);}
+.svc-trigger:focus,.svc-trigger:hover{border-color:var(--rose);box-shadow:0 0 0 3px var(--focus);}
+.svc-trigger.invalid{border-color:var(--rose-deep);}
+/* ── Picker overlay ── */
+#svc-picker{
+  display:none;
+  flex-direction:column;
+}
+.svc-picker-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:28px;flex-shrink:0;
+}
+.svc-picker-title{font-family:var(--fd);font-size:28px;font-weight:400;color:var(--fg1);}
+.svc-back{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:none;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--fg2);transition:background .2s,border-color .2s;
+}
+.svc-back:hover{background:var(--rose-light);border-color:var(--rose);}
+.svc-list{display:flex;flex-direction:column;gap:8px;}
+.svc-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-radius:var(--r-md);
+  border:1.5px solid var(--hairline);cursor:pointer;
+  transition:background .18s,border-color .18s;
+}
+.svc-item:hover{background:var(--rose-light);border-color:var(--rose-blush);}
+.svc-n{font-size:15px;font-weight:300;color:var(--fg1);}
+.svc-p{font-size:13px;font-weight:300;color:var(--fg3);white-space:nowrap;margin-left:8px;}
+.form-title{font-family:var(--fd);font-size:30px;font-weight:400;color:var(--fg1);margin-bottom:26px;}
+.field{margin-bottom:18px;}
+.field label{
+  display:block;font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--fg3);margin-bottom:8px;
+}
+.field input,.field select,.field textarea{
+  width:100%;font-family:var(--fs);font-weight:300;font-size:15px;
+  color:var(--fg1);background:var(--ivory);
+  border:1.5px solid var(--border);border-radius:var(--r-md);
+  padding:13px 16px;outline:none;
+  transition:border .25s,box-shadow .25s,background .25s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--rose);box-shadow:0 0 0 3px var(--focus);background:var(--white);
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--fg3);}
+.field textarea{resize:none;min-height:84px;line-height:1.6;}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a7575' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.f-err{
+  background:#fff8f8;border:1px solid #ffcdd2;border-radius:var(--r-md);
+  padding:11px 14px;font-size:13px;color:#b71c1c;margin-bottom:14px;display:none;
+}
+.f-err.show{display:block;}
+.btn-submit{width:100%;margin-top:8px;}
+.book-ok{text-align:center;padding:20px 0;display:none;}
+.ok-circle{
+  width:64px;height:64px;border-radius:50%;background:var(--linen);
+  color:var(--rose);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+}
+.book-ok h3{font-family:var(--fd);font-size:30px;font-weight:400;color:var(--fg1);margin-bottom:10px;}
+.book-ok p{font-weight:300;color:var(--fg2);line-height:1.7;font-size:15px;}
+.book-ok .btn{margin-top:16px;}
+
+/* ╔══════════════════════════════════════════╗
+   ║           FOOTER                         ║
+   ╚══════════════════════════════════════════╝ */
+.site-footer{background:var(--linen);border-top:1px solid var(--border);padding:72px 0 36px;}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;}
+.footer-logo{height:44px;width:auto;object-fit:contain;mix-blend-mode:multiply;opacity:.85;}
+.footer-desc{font-size:14px;font-weight:300;line-height:1.75;color:var(--fg3);margin:16px 0 0;max-width:240px;}
+.footer-col h5{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--fg3);margin:0 0 18px;opacity:.7;}
+.footer-col ul{list-style:none;padding:0;margin:0;}
+.footer-col li{margin-bottom:10px;}
+.footer-col a{font-size:14px;font-weight:300;color:var(--fg2);transition:color .2s;word-break:break-word;}
+.footer-col a:hover{color:var(--rose);}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:56px;padding-top:24px;border-top:1px solid var(--hairline);
+  flex-wrap:wrap;gap:16px;
+}
+.footer-copy{font-size:12px;letter-spacing:.04em;color:var(--fg3);}
+.footer-soc{display:flex;gap:18px;}
+.footer-soc a{color:var(--rose);opacity:.7;transition:opacity .25s,transform .25s;}
+.footer-soc a:hover{opacity:1;transform:translateY(-2px);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           SCROLL TOP                     ║
+   ╚══════════════════════════════════════════╝ */
+#stb{
+  position:fixed;bottom:32px;right:32px;width:48px;height:48px;
+  background:var(--rose);border-radius:50%;border:none;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ivory);box-shadow:var(--sh-md);z-index:50;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .35s,transform .35s var(--ease),background .25s;
+}
+#stb.show{opacity:1;transform:none;}
+#stb:hover{background:var(--rose-deep);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           ANIMATION INIT STATES          ║
+   ╚══════════════════════════════════════════╝ */
+.fade-up{opacity:0;transform:translateY(44px);}
+.slide-left{opacity:0;transform:translateX(-44px);}
+.slide-right{opacity:0;transform:translateX(44px);}
+
+/* ╔══════════════════════════════════════════╗
+   ║           RESPONSIVE                     ║
+   ╚══════════════════════════════════════════╝ */
+/* ── 1080px ── */
+@media(max-width:1080px){
+  .container{padding:0 36px;}
+  .hero-grid{gap:48px;}
+  .about-grid{gap:56px;}
+  .booking-grid{gap:56px;}
+  .svc-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-grid{grid-template-columns:1fr 1fr;row-gap:40px;}
+  .nav-logo{height:96px;}
+  .site-header.sc .nav-logo{height:78px;}
+}
+
+/* ── 768px ── */
+@media(max-width:768px){
+  .container{padding:0 20px;}
+  /* Header */
+  .nav-links,.nav-cta{display:none;}
+  .menu-btn{display:flex;align-items:center;}
+  .nav-logo{height:78px;}
+  .site-header.sc .nav-logo{height:64px;}
+  .site-header{padding:8px 0;}
+  .site-header.sc{padding:5px 0;}
+  /* Hero */
+  .hero{padding:100px 0 56px;}
+  .hero-grid{grid-template-columns:1fr;gap:32px;}
+  .hero-photo-wrap{order:-1;}
+  .hero-photo-wrap::before{display:none;}
+  .hero-img{aspect-ratio:4/5;object-position:top center;}
+  .hero-badge{left:14px;bottom:16px;}
+  .hero-badge strong{font-size:16px;}
+  .hero-badge span{font-size:9px;}
+  .badge-icon{width:36px;height:36px;}
+  /* Hero text — centre on mobile */
+  #ht{text-align:center;}
+  .hero-eyebrow{justify-content:center;}
+  .hero-eyebrow::before{display:none;}
+  .hero-desc{margin-left:auto;margin-right:auto;text-align:center;}
+  .hero-actions{flex-direction:column;align-items:center;gap:12px;width:100%;}
+  .hero-actions .btn{width:100%;max-width:340px;}
+  /* Stats — stay in a row */
+  .hero-stats{
+    display:flex;flex-direction:row;flex-wrap:wrap;
+    justify-content:center;gap:0;
+    padding-top:24px;margin-top:36px;
+  }
+  .stat{flex:1;min-width:90px;text-align:center;padding:0 12px;}
+  .stat:not(:last-child){border-right:1px solid var(--hairline);}
+  .stat .n{font-size:36px;}
+  .stat .l{font-size:9px;}
+  /* Btn */
+  .btn{padding:13px 24px;font-size:11px;}
+  /* Marquee */
+  .m-item{font-size:17px;padding:0 20px;}
+  /* About */
+  .about{padding:72px 0;}
+  .about-grid{grid-template-columns:1fr;gap:36px;}
+  .about-photo-frame::after{display:none;}
+  .about-img{aspect-ratio:4/5;object-position:center top;}
+  /* Services */
+  .services{padding:72px 0;}
+  .svc-grid{grid-template-columns:1fr;gap:16px;}
+  .sec-head{margin-bottom:40px;}
+  /* Testimonials */
+  .voices-head{top:clamp(78px,11vh,100px);}
+  .voices-stack{height:min(430px,50vh);margin-top:5vh;}
+  .voice-card{padding:30px 22px;gap:18px;}
+  /* Booking */
+  .booking{padding:72px 0;}
+  .booking-grid{grid-template-columns:1fr;gap:40px;}
+  .form-card{padding:24px 18px;}
+  .svc-picker-title{font-size:22px;}
+  .svc-item{padding:12px 14px;}
+  .f-row{grid-template-columns:1fr;}
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr 1fr;row-gap:32px;}
+  .site-footer{padding:48px 0 24px;}
+  .footer-bottom{flex-direction:column;text-align:center;gap:12px;}
+  .footer-copy{font-size:11px;}
+  /* Section */
+  .section{padding:72px 0;}
+  /* Scroll top */
+  #stb{bottom:18px;right:18px;width:42px;height:42px;}
+}
+
+/* ── 480px ── */
+@media(max-width:480px){
+  .container{padding:0 16px;}
+  .hero h1{font-size:clamp(36px,10vw,52px);}
+  .hero-eyebrow{font-size:10px;}
+  .stat .n{font-size:32px;}
+  .stat{min-width:70px;padding:0 8px;}
+  .svc-card h3{font-size:19px;}
+  .about-text h2,.booking-info h2{font-size:clamp(26px,8vw,38px);}
+  .sec-head h2{font-size:clamp(26px,8vw,40px);}
+  .vc-quote{font-size:clamp(16px,4.6vw,22px);}
+  .footer-grid{grid-template-columns:1fr;}
+  .hero-img{aspect-ratio:4/5;}
+}
+</style>
+</head>
+<body>
+
+<div id="pg"></div>
+
+<!-- ═══ MOBILE NAV ═══ -->
+<div class="mob-nav" id="mob-nav">
+  <button class="mob-close" id="mob-close">✕</button>
+  <a onclick="nav('philosophy');closeMob()">Обо мне</a>
+  <a onclick="nav('services');closeMob()">Услуги</a>
+  <a onclick="nav('voices');closeMob()">Отзывы</a>
+  <a onclick="nav('booking');closeMob()">Контакты</a>
+  <button class="mob-nav-cta" onclick="nav('booking');closeMob()">Записаться</button>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header" id="header">
+  <div class="container nav">
+    <a onclick="nav('top')" style="cursor:pointer;display:block;line-height:0">
+      <img src="images/logo.webp" alt="JULIA Aesthetic Medicine" class="nav-logo">
+    </a>
+    <ul class="nav-links">
+      <li><a onclick="nav('philosophy')">Обо мне</a></li>
+      <li><a onclick="nav('services')">Услуги</a></li>
+      <li><a onclick="nav('voices')">Отзывы</a></li>
+      <li><a onclick="nav('booking')">Контакты</a></li>
+    </ul>
+    <button class="nav-cta" onclick="nav('booking')">Записаться</button>
+    <button class="menu-btn" id="menu-btn">
+      <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="0" y1="1" x2="26" y2="1"/><line x1="0" y1="9" x2="20" y2="9"/><line x1="0" y1="17" x2="26" y2="17"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ═══ HERO (с интро-тайтлом поверх) ═══ -->
+<section class="hero" id="top">
+  <!-- INTRO TITLE-CARD — растворяется по скроллу, открывая главную -->
+  <div id="title-card">
+    <div id="tc-bg"></div>
+    <div id="tc-title">
+      <span id="tc-1">JULIA</span>
+      <span id="tc-2">Aesthetic Medicine</span>
+    </div>
+    <div id="tc-hint">
+      <span>Прокрутите вниз</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+    </div>
+  </div>
+  <div class="blob b1" id="b1"></div>
+  <div class="blob b2" id="b2"></div>
+  <div class="blob b3" id="b3"></div>
+  <div class="h-ring h-ring-1"></div>
+  <div class="h-ring h-ring-2"></div>
+
+  <div class="container hero-grid">
+    <div id="ht">
+      <div class="hero-eyebrow" id="h-ey">Косметолог · Rīga, Latvija</div>
+      <h1 id="h-t">
+        <span class="h1-line"><span class="h1-inner">Красота,</span></span>
+        <span class="h1-line"><span class="h1-inner">которая выглядит</span></span>
+        <span class="h1-line"><span class="h1-inner"><em>как ты.</em></span></span>
+      </h1>
+      <p class="hero-desc" id="h-d">Персональный уход за кожей с доказанными методами, для лучшей, отдохнувшей версии себя.</p>
+      <div class="hero-actions" id="h-a">
+        <button class="btn btn-solid" onclick="nav('booking')">
+          Записаться
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </button>
+        <button class="btn btn-outline" onclick="nav('services')">Смотреть услуги</button>
+      </div>
+      <div class="hero-stats" id="h-s">
+        <div class="stat"><div class="n" id="s1">0</div><div class="l">Лет в медицине</div></div>
+        <div class="stat"><div class="n" id="s2">0</div><div class="l">Довольных клиентов</div></div>
+        <div class="stat"><div class="n" id="s3">0</div><div class="l">Видов процедур</div></div>
+      </div>
+    </div>
+
+    <div class="hero-photo-wrap" id="hp">
+      <img src="images/julia1.webp" alt="Юлия, косметолог" class="hero-img"
+           onerror="this.style.background='var(--linen)';this.removeAttribute('src')">
+      <div class="hero-badge">
+        <div class="badge-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <strong>15+ лет</strong>
+          <span>в медицине</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="m-item">Julia Aesthetic Medicine</span><span class="m-dot">·</span>
+    <span class="m-item">Rīga, Latvija</span><span class="m-dot">·</span>
+    <span class="m-item">Профессиональная косметология</span><span class="m-dot">·</span>
+    <span class="m-item">15 лет в медицине</span><span class="m-dot">·</span>
+    <span class="m-item">Tallinas iela 95</span><span class="m-dot">·</span>
+    <span class="m-item">Запись онлайн</span><span class="m-dot">·</span>
+    <span class="m-item">Julia Aesthetic Medicine</span><span class="m-dot">·</span>
+    <span class="m-item">Rīga, Latvija</span><span class="m-dot">·</span>
+    <span class="m-item">Профессиональная косметология</span><span class="m-dot">·</span>
+    <span class="m-item">15 лет в медицине</span><span class="m-dot">·</span>
+    <span class="m-item">Tallinas iela 95</span><span class="m-dot">·</span>
+    <span class="m-item">Запись онлайн</span><span class="m-dot">·</span>
+  </div>
+</div>
+
+<!-- ═══ ОБО МНЕ ═══ -->
+<section class="section about" id="philosophy">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-photo-frame" id="a-photo">
+        <img src="images/julia2.webp" alt="Юлия за работой" class="about-img"
+             onerror="this.style.background='var(--linen)';this.removeAttribute('src')">
+      </div>
+      <div>
+        <span class="eyebrow fade-up">Обо мне</span>
+        <h2 class="about-text h2 fade-up" style="font-family:var(--fd);font-weight:400;font-size:clamp(30px,3.4vw,50px);line-height:1.12;color:var(--fg1);margin:16px 0 20px;">Забота с душой,<br>результат с умом</h2>
+        <p class="fade-up" style="font-size:17px;font-weight:300;line-height:1.85;color:var(--fg2);">Меня зовут Юлия, косметолог с 15-летним опытом в медицине в Риге. Моя цель: не изменить тебя, а раскрыть лучшую версию твоей кожи, используя только доказанные и безопасные методы.</p>
+        <ul class="about-points">
+          <li class="fade-up">
+            <span class="ap-n">01</span>
+            <div><h4>Сначала слушаю</h4><p>Каждый визит начинается с вдумчивой консультации о твоей коже, истории и целях.</p></div>
+          </li>
+          <li class="fade-up">
+            <span class="ap-n">02</span>
+            <div><h4>Деликатный подход</h4><p>Только доказанные, малоинвазивные методы с осторожной и внимательной рукой.</p></div>
+          </li>
+          <li class="fade-up">
+            <span class="ap-n">03</span>
+            <div><h4>Твой результат</h4><p>Естественный, ухоженный вид без переборов. Уверенность, а не трансформация.</p></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ УСЛУГИ ═══ -->
+<section class="section services" id="services">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow fade-up">Услуги</span>
+      <h2 class="fade-up">Персональное меню<br>ухода за кожей</h2>
+      <p class="fade-up">Каждая процедура начинается с консультации. Цены ориентировочные, твой план всегда индивидуален.</p>
+    </div>
+
+    <div class="svc-grid">
+
+      <!-- 1. Губы -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-lips.png" alt="Контурная пластика губ" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Инъекционная</div>
+          <h3>Контурная пластика губ</h3>
+          <p>Мягкое увеличение и моделирование губ гиалуроновым филлером. Естественный, выразительный результат.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 150 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. Ботокс -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-botox.png" alt="Ботулинотерапия" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Инъекционная</div>
+          <h3>Ботулинотерапия (ботокс)</h3>
+          <p>Разглаживание мимических морщин лба, межбровья и глаз. Мягко и без «заморозки» лица.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 80 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. Гипергидроз -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-hyperhidrosis.png" alt="Лечение гипергидроза" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Лечебная</div>
+          <h3>Лечение гипергидроза</h3>
+          <p>Эффективное снижение избыточного потоотделения методом ботулинотерапии. Результат до 8 месяцев.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 250 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. Биоревитализация -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-biore.png" alt="Биоревитализация" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Увлажнение</div>
+          <h3>Биоревитализация</h3>
+          <p>Интенсивное увлажнение кожи гиалуроновой кислотой. Сияние и упругость уже после первой процедуры.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 100 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5. Чистка -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-peeling.png" alt="Чистка лица + пилинг" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Аппаратная</div>
+          <h3>Чистка лица + пилинг</h3>
+          <p>Глубокое очищение аппаратом ZEMITS и химический пилинг. Чистые поры, ровный тон, свежее сияние.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 50 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 6. Акне -->
+      <article class="svc-card">
+        <div class="svc-visual">
+          <img src="images/svc-acne.png" alt="Лечение акне и постакне" class="svc-img">
+        </div>
+        <div class="svc-body">
+          <div class="svc-tag">Лечебная</div>
+          <h3>Лечение акне и постакне</h3>
+          <p>Комплексный подход к проблемной коже: химические пилинги, аппаратные методы, профессиональный уход.</p>
+          <div class="svc-footer">
+            <span class="svc-price">от 60 €</span>
+            <button class="svc-go" onclick="nav('booking')">→</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ОТЗЫВЫ ═══ -->
+<section class="voices" id="voices">
+  <div class="voices-sticky">
+    <div class="voices-head">
+      <span class="eyebrow">Отзывы</span>
+      <h2>Что говорят клиенты</h2>
+    </div>
+    <div class="voices-stack" id="voices-stack">
+      <article class="voice-card">
+        <div class="vc-stars"></div>
+        <blockquote class="vc-quote">«Наконец-то я выгляжу так, какой себя вижу в голове: отдохнувшей, естественной, собой. Юлия слушает, и это видно в каждом результате.»</blockquote>
+        <div class="vc-author"><span class="vc-avatar">АК</span><div class="vc-meta"><span class="vc-name">Анастасия К.</span><span class="vc-role">клиент с 2022</span></div></div>
+      </article>
+      <article class="voice-card">
+        <div class="vc-stars"></div>
+        <blockquote class="vc-quote">«Я долго боялась идти к новому специалисту. Юлия стала первым косметологом, которому я доверяю полностью. Объясняет каждый шаг, даёт потрясающий результат.»</blockquote>
+        <div class="vc-author"><span class="vc-avatar">МЛ</span><div class="vc-meta"><span class="vc-name">Мария Л.</span><span class="vc-role">клиент с 2021</span></div></div>
+      </article>
+      <article class="voice-card">
+        <div class="vc-stars"></div>
+        <blockquote class="vc-quote">«Сделала контурную пластику губ, и результат превзошёл все ожидания. Очень естественно и красиво. Юлия подобрала идеальный объём именно для моего лица.»</blockquote>
+        <div class="vc-author"><span class="vc-avatar">ЕВ</span><div class="vc-meta"><span class="vc-name">Екатерина В.</span><span class="vc-role">клиент с 2023</span></div></div>
+      </article>
+      <article class="voice-card">
+        <div class="vc-stars"></div>
+        <blockquote class="vc-quote">«Делаю чистку лица каждый месяц уже два года. Кожа сияет, поры чистые. Юлия работает с душой, и это чувствуется с первой минуты.»</blockquote>
+        <div class="vc-author"><span class="vc-avatar">ВС</span><div class="vc-meta"><span class="vc-name">Виктория С.</span><span class="vc-role">клиент с 2020</span></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ЗАПИСЬ ═══ -->
+<section class="section booking" id="booking">
+  <div class="container">
+    <div class="booking-grid">
+
+      <div id="bi">
+        <span class="eyebrow fade-up">Запись</span>
+        <h2 class="fade-up" style="font-family:var(--fd);font-weight:400;font-size:clamp(30px,3.4vw,50px);line-height:1.1;color:var(--fg1);margin:16px 0 20px;">Начните<br>с разговора</h2>
+        <p class="fade-up" style="font-size:16px;font-weight:300;line-height:1.85;color:var(--fg2);">Заполните форму, и я свяжусь с вами в течение рабочего дня, подберём удобное время.</p>
+        <ul class="info-list">
+          <li class="fade-up">
+            <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            Tallinas iela 95, Rīga
+          </li>
+          <li class="fade-up">
+            <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+            Пн-Пт · 9:00-18:00
+          </li>
+          <li class="fade-up">
+            <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></span>
+            <a href="tel:+37122368542">+371 22 368 542</a>
+          </li>
+          <li class="fade-up">
+            <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <a href="mailto:novohatskayliia33@gmail.com" style="word-break:break-all">novohatskayliia33@gmail.com</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="form-card slide-right" id="fc">
+        <div class="book-ok" id="book-ok">
+          <div class="ok-circle">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Заявка принята!</h3>
+          <p>Я получила вашу заявку и свяжусь с вами в ближайшее время. Спасибо!</p>
+          <button class="btn btn-outline" style="margin-top:16px;display:flex;width:100%;justify-content:center" onclick="resetForm()">Отправить ещё раз</button>
+          <a href="https://t.me/Yl_53" target="_blank" rel="noopener" class="btn btn-solid" style="margin-top:10px;display:inline-flex">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.829.941z"/></svg>
+            Написать в Telegram
+          </a>
+        </div>
+        <div id="fi">
+          <p class="form-title">Записаться онлайн</p>
+          <div class="f-err" id="ferr">Ошибка отправки. Позвоните: <a href="tel:+37122368542">+371 22 368 542</a></div>
+          <form id="bform" onsubmit="sendForm(event)">
+            <div class="f-row">
+              <div class="field"><label>Имя</label><input type="text" name="name" required placeholder="Ваше имя"></div>
+              <div class="field"><label>Телефон</label><input type="tel" name="phone" required placeholder="+371 ..."></div>
+            </div>
+            <div class="field">
+              <label>Услуга</label>
+              <button type="button" class="svc-trigger" id="svc-trigger" onclick="openPicker()">
+                <span id="svc-label">Выберите услугу…</span>
+                <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <input type="hidden" name="service" id="svc-val">
+            </div>
+            <div class="field"><label>Пожелания по дате и времени</label><textarea name="comment" placeholder="Например: предпочитаю утро, среда или пятница…"></textarea></div>
+            <button type="submit" class="btn btn-solid btn-submit" id="sbtn">
+              <span id="stxt">Отправить заявку</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- ── Service picker overlay ── -->
+        <div id="svc-picker">
+          <div class="svc-picker-head">
+            <span class="svc-picker-title">Выберите услугу</span>
+            <button type="button" class="svc-back" onclick="closePicker()" title="Назад">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+            </button>
+          </div>
+          <div class="svc-list">
+            <div class="svc-item" onclick="pickService('Контурная пластика губ','от 150 €')">
+              <span class="svc-n">Контурная пластика губ</span><span class="svc-p">от 150 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Ботулинотерапия, ботокс','от 80 €')">
+              <span class="svc-n">Ботулинотерапия, ботокс</span><span class="svc-p">от 80 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Лечение гипергидроза','от 250 €')">
+              <span class="svc-n">Лечение гипергидроза</span><span class="svc-p">от 250 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Биоревитализация','от 100 €')">
+              <span class="svc-n">Биоревитализация</span><span class="svc-p">от 100 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Чистка лица + пилинг','от 50 €')">
+              <span class="svc-n">Чистка лица + пилинг</span><span class="svc-p">от 50 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Лечение акне и постакне','от 60 €')">
+              <span class="svc-n">Лечение акне и постакне</span><span class="svc-p">от 60 €</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Консультация','бесплатно')">
+              <span class="svc-n">Консультация</span><span class="svc-p">бесплатно</span>
+            </div>
+            <div class="svc-item" onclick="pickService('Другое / не выбрала','')">
+              <span class="svc-n">Другое / не выбрала</span><span class="svc-p"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="images/logo.webp" alt="JULIA Aesthetic Medicine" class="footer-logo">
+        <p class="footer-desc">Персональная косметология в Риге, с заботой, опытом и настоящим вниманием к каждому клиенту.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Навигация</h5>
+        <ul>
+          <li><a onclick="nav('philosophy')">Обо мне</a></li>
+          <li><a onclick="nav('services')">Услуги</a></li>
+          <li><a onclick="nav('voices')">Отзывы</a></li>
+          <li><a onclick="nav('booking')">Запись</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Адрес</h5>
+        <ul>
+          <li><a>Tallinas iela 95</a></li>
+          <li><a>Rīga, Latvija</a></li>
+          <li><a>Пн-Пт · 9:00-18:00</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Контакты</h5>
+        <ul>
+          <li><a href="tel:+37122368542">+371 22 368 542</a></li>
+          <li><a href="mailto:novohatskayliia33@gmail.com">novohatskayliia33@gmail.com</a></li>
+          <li><a href="https://t.me/Yl_53" target="_blank" rel="noopener">Telegram: @Yl_53</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 JULIA Aesthetic Medicine · Rīga</span>
+      <div class="footer-soc">
+        <a href="https://www.instagram.com/dr_julia_riga?igsh=eGx1dXkwZ280YTQ2&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="https://t.me/Yl_53" target="_blank" rel="noopener" aria-label="Telegram">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.829.941z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="stb" onclick="nav('top')" aria-label="Наверх">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════ -->
+<script>
+/* ══ TELEGRAM CONFIG ══
+   1. Создай бота у @BotFather → получи TOKEN
+   2. Напиши боту любое сообщение
+   3. api.telegram.org/bot{TOKEN}/getUpdates → найди chat.id
+   4. Вставь значения ниже
+   ════════════════════ */
+const TG_TOKEN    = 'ВСТАВЬТЕ_ТОКЕН_БОТА';
+const TG_CHAT_ID  = 'ВСТАВЬТЕ_CHAT_ID';
+const TG_USERNAME = 'Yl_53';
+
+/* ── utils ── */
+function nav(id){
+  if(id==='top'){window.scrollTo({top:0,behavior:'smooth'});return;}
+  const el=document.getElementById(id);
+  if(!el)return;
+  const y=el.getBoundingClientRect().top+scrollY-76;
+  window.scrollTo({top:y,behavior:'smooth'});
+}
+
+/* ── mobile nav ── */
+const mobNav=document.getElementById('mob-nav');
+document.getElementById('menu-btn').onclick=()=>{mobNav.classList.add('open');document.body.style.overflow='hidden';};
+document.getElementById('mob-close').onclick=closeMob;
+function closeMob(){mobNav.classList.remove('open');document.body.style.overflow='';}
+
+/* ── scroll state ── */
+const pg=document.getElementById('pg');
+const hdr=document.getElementById('header');
+const stb=document.getElementById('stb');
+window.addEventListener('scroll',()=>{
+  const p=scrollY/(document.documentElement.scrollHeight-innerHeight)*100;
+  pg.style.width=p+'%';
+  hdr.classList.toggle('sc',scrollY>60);
+  stb.classList.toggle('show',scrollY>600);
+},{passive:true});
+
+/* ══ INIT · INTRO (scroll-expand greeting) + SECTION ANIMATIONS ══ */
+function revealAll(){
+  document.body.classList.remove('intro-on');
+  var tc=document.getElementById('title-card'); if(tc) tc.style.display='none';
+  ['#h-ey','#h-d','#h-a','#h-s','#hp'].forEach(function(s){var e=document.querySelector(s);if(e){e.style.opacity='1';e.style.transform='none';e.style.clipPath='none';}});
+  document.querySelectorAll('.h1-inner').forEach(function(e){e.style.transform='none';e.style.opacity='1';});
+  document.querySelectorAll('.fade-up,.slide-left,.slide-right').forEach(function(e){e.style.opacity='1';e.style.transform='none';});
+  if(document.getElementById('s1') && document.getElementById('s1').textContent==='0' && typeof runCounters==='function') runCounters();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(typeof gsap==='undefined'){ revealAll(); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  document.body.classList.add('intro-on');
+  let countersDone=false;
+
+  /* INTRO → ГЛАВНАЯ: тайтл «JULIA» разъезжается и растворяется, открывая главную
+     страницу (фото проявляется + заголовок + кнопки + статистика). Привязано к скроллу. */
+  gsap.timeline({scrollTrigger:{
+      trigger:'#top',start:'top top',end:'+=120%',
+      pin:true,scrub:1,anticipatePin:1,invalidateOnRefresh:true,
+      onUpdate(self){
+        document.body.classList.toggle('intro-on', self.progress<0.6);
+        if(self.progress>0.55 && !countersDone){ countersDone=true; runCounters(); }
+      }
+    }})
+    /* тайтл-карта разъезжается и тает */
+    .to('#tc-1',{x:()=>-window.innerWidth*0.62,opacity:0,ease:'none',duration:.5},0)
+    .to('#tc-2',{x:()=> window.innerWidth*0.62,opacity:0,ease:'none',duration:.5},0)
+    .to('#tc-hint',{opacity:0,ease:'none',duration:.18},0)
+    .to('#tc-bg',{opacity:0,ease:'none',duration:.6},0.08)
+    /* главная страница проявляется по мере скролла */
+    .fromTo('#hp',{autoAlpha:0,scale:.84,y:24},{autoAlpha:1,scale:1,y:0,ease:'none',duration:.62},0.30)
+    .to('#h-ey',{opacity:1,ease:'none',duration:.3},0.40)
+    .fromTo('.h1-inner',{y:0,yPercent:110},{y:0,yPercent:0,ease:'none',duration:.42,stagger:.05},0.42)
+    .to('#h-d',{opacity:1,y:0,ease:'none',duration:.32},0.56)
+    .to('#h-a',{opacity:1,y:0,ease:'none',duration:.32},0.63)
+    .to('#h-s',{opacity:1,y:0,ease:'none',duration:.32},0.70);
+
+  setupScroll();
+
+  /* «ОБО МНЕ» появляется с 3D-распрямлением (наклон → плоскость), привязка к скроллу (scrub, без pin) */
+  (function(){
+    const grid=document.querySelector('.about-grid'); if(!grid) return;
+    const mob=window.innerWidth<=768;
+    gsap.set(grid,{transformPerspective:1100,transformOrigin:'center center',rotateX:mob?13:16,scale:mob?0.93:0.97});
+    gsap.timeline({scrollTrigger:{trigger:'.about',start:'top 60%',end:'top 22%',scrub:1,invalidateOnRefresh:true}})
+      .to(grid,{rotateX:0,scale:1,ease:'none'},0);
+  })();
+
+  /* «УСЛУГИ» — тот же 3D-переход для сетки карточек */
+  (function(){
+    const grid=document.querySelector('.svc-grid'); if(!grid) return;
+    const mob=window.innerWidth<=768;
+    gsap.set(grid,{transformPerspective:1100,transformOrigin:'center top',rotateX:mob?12:15,scale:mob?0.95:0.97,opacity:0});
+    gsap.timeline({scrollTrigger:{trigger:'.svc-grid',start:'top 62%',end:'top 26%',scrub:1,invalidateOnRefresh:true}})
+      .to(grid,{rotateX:0,scale:1,opacity:1,ease:'none'},0);
+  })();
+
+  /* ОТЗЫВЫ — стек карточек: верхняя отлетает вверх с поворотом, открывая следующую (sticky + scrub) */
+  (function(){
+    const stack=document.querySelector('.voices-stack'); if(!stack) return;
+    const cards=gsap.utils.toArray('.voice-card'); const N=cards.length; if(!N) return;
+    function render(p){
+      const front=p*(N-1);
+      cards.forEach((c,i)=>{
+        const d=i-front; let x,y,rot,scale,op,z;
+        if(d<=0){
+          /* верхняя карточка уезжает вверх-влево, оставаясь НЕпрозрачной — перекрывает нижние, текст не просвечивает */
+          const t=Math.min(-d,1.2), tc=Math.min(t,1);
+          x=-10*tc; y=-150*t;
+          rot=-10*tc; scale=1+0.04*tc;
+          op=t>1.05?0:1;
+          z=40+i;
+        } else {
+          /* карточки в стопке убраны строго ЗА переднюю: видна только тонкая пустая кромка снизу, без текста */
+          const dd=Math.min(d,2);
+          x=0; y=dd*5; rot=dd*1.5; scale=1-dd*0.05; op=d>2.05?0:1; z=30-i;
+        }
+        op=Math.max(0,Math.min(1,op));
+        c.style.transform='translate('+x+'px,'+y+'%) rotate('+rot+'deg) scale('+scale+')';
+        c.style.opacity=op; c.style.zIndex=Math.round(z);
+      });
+    }
+    render(0);
+    ScrollTrigger.create({trigger:'.voices',start:'top 10%',end:'bottom bottom',scrub:1,invalidateOnRefresh:true,onUpdate(self){render(self.progress);}});
+  })();
+
+});
+
+/* safety net: если GSAP не загрузился — показать контент, не прятать сайт */
+window.addEventListener('load',function(){ setTimeout(function(){ if(typeof gsap==='undefined') revealAll(); },300); });
+
+/* ══ HERO ENTRANCE ══ */
+function heroIn(){
+  const tl=gsap.timeline();
+  tl.to('#h-ey',{opacity:1,duration:.8,ease:'power2.out'},0)
+    .to('.h1-inner',{y:'0%',duration:1,stagger:.1,ease:'power4.out'},'.12')
+    .to(['#h-d','#h-a','#h-s'],{opacity:1,y:0,duration:.85,stagger:.13,ease:'power3.out'},'.45')
+    .fromTo('#hp',
+      {clipPath:'inset(0 100% 0 0 round 24px)',opacity:0},
+      {clipPath:'inset(0 0% 0 0 round 24px)',opacity:1,duration:1.5,ease:'power4.inOut'},
+      '.15');
+  setTimeout(runCounters,800);
+}
+
+/* ── counters ── */
+function runCounters(){
+  [{id:'s1',v:15,sfx:'+'},{id:'s2',v:500,sfx:'+'},{id:'s3',v:20,sfx:'+'}].forEach(({id,v,sfx})=>{
+    const el=document.getElementById(id);
+    const t0=performance.now(),dur=1800;
+    (function tick(now){
+      const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(e*v)+(p>=1?sfx:'');
+      if(p<1)requestAnimationFrame(tick);
+    })(performance.now());
+  });
+}
+
+/* ══ SCROLL ANIMATIONS ══ */
+function setupScroll(){
+  /* generic fade-up */
+  document.querySelectorAll('.fade-up').forEach(el=>{
+    gsap.to(el,{opacity:1,y:0,duration:.85,ease:'power3.out',
+      scrollTrigger:{trigger:el,start:'top 90%',once:true}});
+  });
+
+  /* slide-left / slide-right */
+  document.querySelectorAll('.slide-left').forEach(el=>{
+    gsap.to(el,{opacity:1,x:0,duration:1,ease:'power3.out',
+      scrollTrigger:{trigger:el,start:'top 86%',once:true}});
+  });
+  document.querySelectorAll('.slide-right').forEach(el=>{
+    gsap.to(el,{opacity:1,x:0,duration:1,ease:'power3.out',
+      scrollTrigger:{trigger:el,start:'top 86%',once:true}});
+  });
+
+  /* hero blobs subtle fade on scroll (no scrub — no block) */
+  gsap.to(['.b1','.b2','.b3'],{opacity:0,duration:.6,ease:'power2.out',
+    scrollTrigger:{trigger:'.hero',start:'bottom 60%',once:true}});
+
+  /* booking */
+  gsap.fromTo('#bi',{x:-52,opacity:0},{x:0,opacity:1,duration:.95,ease:'power3.out',
+    scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
+  gsap.fromTo('#fc',{x:52,opacity:0},{x:0,opacity:1,duration:.95,ease:'power3.out',
+    scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
+
+  /* footer */
+  gsap.fromTo('.site-footer',{opacity:0,y:28},{opacity:1,y:0,duration:.8,ease:'power2.out',
+    scrollTrigger:{trigger:'.site-footer',start:'top 96%',once:true}});
+
+  /* about-points stagger */
+  gsap.utils.toArray('.about-points li').forEach((li,i)=>{
+    gsap.fromTo(li,{opacity:0,x:-28},{opacity:1,x:0,
+      duration:.7,delay:i*.09,ease:'power3.out',
+      scrollTrigger:{trigger:li,start:'top 92%',once:true}});
+  });
+}
+
+/* ══ ОТЗЫВЫ — звёзды рейтинга (5★) ══ */
+(function(){
+  var STAR='<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.05 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z"/></svg>';
+  document.querySelectorAll('.vc-stars').forEach(function(el){el.innerHTML=STAR.repeat(5);});
+})();
+
+/* ══ SERVICE PICKER ══ */
+(function(){
+  var _normalH=0;
+  window.openPicker=function(){
+    var fc=document.getElementById('fc'),
+        fi=document.getElementById('fi'),
+        picker=document.getElementById('svc-picker');
+    _normalH=fc.offsetHeight;
+    gsap.killTweensOf(fc);
+    gsap.killTweensOf(fi);
+    fc.style.overflow='hidden';
+    fc.style.height=_normalH+'px';
+    gsap.to(fi,{opacity:0,y:-10,duration:0.22,ease:'power2.in',onComplete:function(){
+      fi.style.display='none';
+      picker.style.display='flex';
+      fc.style.height='';
+      var targetH=fc.offsetHeight;
+      fc.style.height=_normalH+'px';
+      var shift=-(targetH-_normalH)/2;
+      gsap.set(picker,{opacity:0,y:14});
+      gsap.to(fc,{height:targetH,y:shift,duration:0.42,ease:'power2.inOut',onComplete:function(){
+        fc.style.height='auto';
+      }});
+      gsap.to(picker,{opacity:1,y:0,duration:0.3,delay:0.2,ease:'power2.out'});
+    }});
+  };
+  window.closePicker=function(){
+    var fc=document.getElementById('fc'),
+        fi=document.getElementById('fi'),
+        picker=document.getElementById('svc-picker');
+    var currentH=fc.offsetHeight;
+    fc.style.height=currentH+'px';
+    fc.style.overflow='hidden';
+    gsap.killTweensOf(fc);
+    gsap.killTweensOf(picker);
+    gsap.to(picker,{opacity:0,y:-10,duration:0.22,ease:'power2.in',onComplete:function(){
+      picker.style.display='none';
+      fi.style.display='block';
+      fc.style.height='';
+      var targetH=fc.offsetHeight;
+      fc.style.height=currentH+'px';
+      gsap.set(fi,{opacity:0,y:12});
+      gsap.to(fc,{height:targetH,y:0,duration:0.42,ease:'power2.inOut',onComplete:function(){
+        fc.style.height='auto';
+        fc.style.overflow='';
+        gsap.set(fc,{clearProps:'y'});
+      }});
+      gsap.to(fi,{opacity:1,y:0,duration:0.3,delay:0.2,ease:'power2.out'});
+    }});
+  };
+  window.pickService=function(name,price){
+    var val=name+(price?' ('+price+')':'');
+    document.getElementById('svc-val').value=val;
+    document.getElementById('svc-label').textContent=name;
+    var t=document.getElementById('svc-trigger');
+    t.classList.add('has-val');
+    t.classList.remove('invalid');
+    closePicker();
+  };
+})();
+
+/* ══ FORM SUBMISSION ══ */
+async function sendForm(e){
+  e.preventDefault();
+  const btn=document.getElementById('sbtn'),
+        err=document.getElementById('ferr'),
+        fd=new FormData(e.target);
+  /* validate service */
+  if(!fd.get('service')){
+    var t=document.getElementById('svc-trigger');
+    t.classList.add('invalid');
+    t.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  err.classList.remove('show');
+  btn.disabled=true;
+  document.getElementById('stxt').textContent='Отправляем…';
+  const name=fd.get('name'),phone=fd.get('phone'),
+        service=fd.get('service'),comment=fd.get('comment')||'не указано';
+  const text=`🌸 <b>Новая заявка с сайта</b>\n\n👤 <b>Имя:</b> ${name}\n📞 <b>Телефон:</b> ${phone}\n✨ <b>Услуга:</b> ${service}\n💬 <b>Пожелания:</b> ${comment}\n\n🕐 ${new Date().toLocaleString('ru-RU')}`;
+  try{
+    if(TG_TOKEN==='ВСТАВЬТЕ_ТОКЕН_БОТА'){showOk();return;}
+    const r=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,
+      {method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({chat_id:TG_CHAT_ID,text,parse_mode:'HTML'})});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.description);
+    showOk();
+  }catch{
+    err.classList.add('show');
+    btn.disabled=false;
+    document.getElementById('stxt').textContent='Отправить заявку';
+  }
+}
+function showOk(){
+  document.getElementById('fi').style.display='none';
+  const ok=document.getElementById('book-ok');
+  ok.style.display='block';
+  gsap.fromTo(ok,{opacity:0,y:24},{opacity:1,y:0,duration:.75,ease:'power3.out'});
+}
+function resetForm(){
+  document.getElementById('bform').reset();
+  document.getElementById('book-ok').style.display='none';
+  document.getElementById('fi').style.display='block';
+  document.getElementById('sbtn').disabled=false;
+  document.getElementById('stxt').textContent='Отправить заявку';
+  document.getElementById('svc-val').value='';
+  document.getElementById('svc-label').textContent='Выберите услугу…';
+  var t=document.getElementById('svc-trigger');
+  t.classList.remove('has-val','invalid');
+}
+
+</script>
+</body>
+</html>
