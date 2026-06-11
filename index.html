@@ -652,7 +652,10 @@ body.intro-on #stb{opacity:0 !important;pointer-events:none;}
   /* убираем дорогой blur на мобильных — главная причина краша */
   .blob{filter:none !important;}
   .site-header.sc{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(248,241,237,.98);}
-  #title-card{display:none !important;}
+  /* запрещаем горизонтальный overscroll (свайп назад ломает вёрстку) */
+  body{overscroll-behavior-x:none;}
+  /* slide-анимации на мобильных — только по Y, без горизонтального выхода за экран */
+  .slide-left,.slide-right{transform:translateY(24px) !important;}
   /* Booking */
   .booking{padding:72px 0;}
   .booking-grid{grid-template-columns:1fr;gap:40px;}
@@ -1186,10 +1189,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(typeof gsap==='undefined'){ revealAll(); return; }
   gsap.registerPlugin(ScrollTrigger);
 
-  /* На мобильных — пропускаем тяжёлую pin-анимацию, сразу показываем контент */
+  /* На мобильных — лёгкое timed-интро вместо scroll-pin (pin вызывал краш браузера) */
   if(window.innerWidth<=768){
-    revealAll();
-    runCounters();
+    document.body.classList.add('intro-on');
+    /* Тайтл-карта: появляется */
+    gsap.set('#tc-1',{opacity:0,y:28});
+    gsap.set('#tc-2',{opacity:0,y:18});
+    gsap.set('#tc-hint',{opacity:0});
+    gsap.to('#tc-1',{opacity:1,y:0,duration:.7,ease:'power2.out'});
+    gsap.to('#tc-2',{opacity:1,y:0,duration:.6,ease:'power2.out',delay:.2});
+    gsap.to('#tc-hint',{opacity:1,duration:.5,delay:.6});
+    /* Через 1.6с тайтл-карта плавно уходит, контент проявляется */
+    setTimeout(function(){
+      gsap.to('#title-card',{opacity:0,duration:.55,ease:'power2.inOut',onComplete:function(){
+        revealAll();
+        runCounters();
+      }});
+    },1600);
     setupScroll();
     (function(){
       const grid=document.querySelector('.about-grid'); if(!grid) return;
@@ -1334,19 +1350,21 @@ function runCounters(){
 
 /* ══ SCROLL ANIMATIONS ══ */
 function setupScroll(){
+  const mob=window.innerWidth<=768;
+
   /* generic fade-up */
   document.querySelectorAll('.fade-up').forEach(el=>{
     gsap.to(el,{opacity:1,y:0,duration:.85,ease:'power3.out',
       scrollTrigger:{trigger:el,start:'top 90%',once:true}});
   });
 
-  /* slide-left / slide-right */
+  /* slide-left / slide-right — на мобильных только y (не x), чтобы не было overflow */
   document.querySelectorAll('.slide-left').forEach(el=>{
-    gsap.to(el,{opacity:1,x:0,duration:1,ease:'power3.out',
+    gsap.to(el,{opacity:1,x:0,y:0,duration:mob?.75:1,ease:'power3.out',
       scrollTrigger:{trigger:el,start:'top 86%',once:true}});
   });
   document.querySelectorAll('.slide-right').forEach(el=>{
-    gsap.to(el,{opacity:1,x:0,duration:1,ease:'power3.out',
+    gsap.to(el,{opacity:1,x:0,y:0,duration:mob?.75:1,ease:'power3.out',
       scrollTrigger:{trigger:el,start:'top 86%',once:true}});
   });
 
@@ -1354,21 +1372,26 @@ function setupScroll(){
   gsap.to(['.b1','.b2','.b3'],{opacity:0,duration:.6,ease:'power2.out',
     scrollTrigger:{trigger:'.hero',start:'bottom 60%',once:true}});
 
-  /* booking */
-  gsap.fromTo('#bi',{x:-52,opacity:0},{x:0,opacity:1,duration:.95,ease:'power3.out',
-    scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
-  gsap.fromTo('#fc',{x:52,opacity:0},{x:0,opacity:1,duration:.95,ease:'power3.out',
-    scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
+  /* booking — на мобильных fade от низа, без горизонтального сдвига */
+  gsap.fromTo('#bi',
+    {x:mob?0:-52,y:mob?20:0,opacity:0},
+    {x:0,y:0,opacity:1,duration:.95,ease:'power3.out',
+      scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
+  gsap.fromTo('#fc',
+    {x:mob?0:52,y:mob?20:0,opacity:0},
+    {x:0,y:0,opacity:1,duration:.95,ease:'power3.out',
+      scrollTrigger:{trigger:'#booking',start:'top 80%',once:true}});
 
   /* footer */
   gsap.fromTo('.site-footer',{opacity:0,y:28},{opacity:1,y:0,duration:.8,ease:'power2.out',
     scrollTrigger:{trigger:'.site-footer',start:'top 96%',once:true}});
 
-  /* about-points stagger */
+  /* about-points stagger — на мобильных fade, без x */
   gsap.utils.toArray('.about-points li').forEach((li,i)=>{
-    gsap.fromTo(li,{opacity:0,x:-28},{opacity:1,x:0,
-      duration:.7,delay:i*.09,ease:'power3.out',
-      scrollTrigger:{trigger:li,start:'top 92%',once:true}});
+    gsap.fromTo(li,
+      {opacity:0,x:mob?0:-28},
+      {opacity:1,x:0,duration:.7,delay:i*.09,ease:'power3.out',
+        scrollTrigger:{trigger:li,start:'top 92%',once:true}});
   });
 }
 
