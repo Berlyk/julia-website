@@ -477,6 +477,8 @@ body.intro-on #stb{opacity:0 !important;pointer-events:none;}
 #svc-picker{
   display:none;
   flex-direction:column;
+  width:100%;
+  overflow:hidden;
 }
 .svc-picker-head{
   display:flex;align-items:center;justify-content:space-between;
@@ -498,8 +500,8 @@ body.intro-on #stb{opacity:0 !important;pointer-events:none;}
   transition:background .18s,border-color .18s;
 }
 .svc-item:hover{background:var(--rose-light);border-color:var(--rose-blush);}
-.svc-n{font-size:15px;font-weight:300;color:var(--fg1);}
-.svc-p{font-size:13px;font-weight:300;color:var(--fg3);white-space:nowrap;margin-left:8px;}
+.svc-n{font-size:15px;font-weight:300;color:var(--fg1);flex:1;min-width:0;}
+.svc-p{font-size:13px;font-weight:300;color:var(--fg3);white-space:nowrap;margin-left:8px;flex-shrink:0;}
 .form-title{font-family:var(--fd);font-size:30px;font-weight:400;color:var(--fg1);margin-bottom:26px;}
 .field{margin-bottom:18px;}
 .field label{
@@ -1198,6 +1200,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(typeof gsap==='undefined'){ revealAll(); return; }
   gsap.registerPlugin(ScrollTrigger);
 
+  /* Фиксируем высоты voices-секции в px — чтобы iOS address-bar не вызывал
+     reflow при показе/скрытии (vh пересчитывается → ScrollTrigger прыгает) */
+  (function(){
+    var vh=window.innerHeight;
+    var v=document.querySelector('.voices');
+    var vs=document.querySelector('.voices-sticky');
+    if(v) v.style.height=(vh*3)+'px';
+    if(vs){vs.style.height=Math.round(vh*0.9)+'px';vs.style.top=Math.round(vh*0.1)+'px';}
+    var lastW=window.innerWidth;
+    window.addEventListener('resize',function(){
+      if(window.innerWidth===lastW) return; // игнорируем изменение только высоты (iOS bar)
+      lastW=window.innerWidth;
+      vh=window.innerHeight;
+      if(v) v.style.height=(vh*3)+'px';
+      if(vs){vs.style.height=Math.round(vh*0.9)+'px';vs.style.top=Math.round(vh*0.1)+'px';}
+      ScrollTrigger.refresh();
+    },{passive:true});
+  })();
+
   /* На мобильных — тот же scroll-pin что на десктопе (blur убран → краша нет) */
   if(window.innerWidth<=768){
     document.body.classList.add('intro-on');
@@ -1443,10 +1464,12 @@ function setupScroll(){
       fc.style.height='';
       var targetH=fc.offsetHeight;
       fc.style.height=_normalH+'px';
-      var shift=-(targetH-_normalH)/2;
+      var mob=window.innerWidth<=768;
+      var shift=mob?0:-(targetH-_normalH)/2;
       gsap.set(picker,{opacity:0,y:14});
       gsap.to(fc,{height:targetH,y:shift,duration:0.42,ease:'power2.inOut',onComplete:function(){
         fc.style.height='auto';
+        if(mob) gsap.set(fc,{clearProps:'y'});
       }});
       gsap.to(picker,{opacity:1,y:0,duration:0.3,delay:0.2,ease:'power2.out'});
     }});
@@ -1520,6 +1543,7 @@ async function sendForm(e){
   }
 }
 function showOk(){
+  gsap.set('#fc',{clearProps:'y,height,overflow'});
   document.getElementById('fi').style.display='none';
   const ok=document.getElementById('book-ok');
   ok.style.display='block';
